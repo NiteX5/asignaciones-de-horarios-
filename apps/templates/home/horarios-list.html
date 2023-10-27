@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Horarios {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap');
+body {
+  margin: 40px 10px;
+  padding: 0;
+  font-family: "Open Sans", Arial, sans-serif;
+  font-size: 14px;
+
+}
+.cal-wrapper{background:#fff;max-width:1200px;margin:0 auto;padding:20px;
+border-radius:10px;}
+
+#calendar {
+
+  
+}
+
+.fc-timegrid-slot-label {
+  font-weight: 800;
+}
+
+.fc-timegrid-slots table tr {
+  transition: all .15s ease;
+}
+
+.fc-timegrid-slots table tr:hover {
+  background: #fffae2 !important;
+  transition: all .15s ease;
+}
+
+.fc-timegrid-slots table tr:nth-child(4n + 1) {
+  //background: #fffae2 !important;}
+
+.fc-timegrid-slot-label[data-time*=":15"],
+.fc-timegrid-slot-label[data-time*=":30"],
+.fc-timegrid-slot-label[data-time*=":45"] {
+  font-size: 80%;
+  opacity: 0.5;
+  font-weight: 400;
+}
+
+
+
+
+.fc-timegrid-axis-frame:after {
+  content: 'L';
+  font-family: 'Times';
+  line-height: 36px;
+  text-align: center;
+  display: block;
+  width: 100%;
+  font-size: 24px;
+  color: #f16621;
+}
+</style>
+
+<h4 class="mb-3">Horario</h4>
+
+
+<div class="customCalendar pt-5">
+  <div id="kt_docs_fullcalendar_drag"></div>
+  </nav>
+</div>
+
+{% include "includes/table-calendar-View.html" %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

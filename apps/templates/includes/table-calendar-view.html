@@ -1,0 +1,23 @@
+<script>
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    
+    var calendarEl = document.getElementById("kt_docs_fullcalendar_drag");
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "timeGridWeek",
+      headerToolbar: false,
+      allDaySlot: false,
+      slotMinTime: "08:00:00",
+      slotMaxTime: "18:00:00",
+      slotDuration: "00:15",
+      slotLabelInterval: "00:15",
+      eventOverlap: false,
+      contentHeight: 'auto',
+      hiddenDays: [0, 6],
+      
+    });
+
+    calendar.setOption('height', 250);
+    calendar.render();
+  });
+</script>

@@ -1,0 +1,178 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}
+    Asignación de Asignaturas 
+{% endblock %}
+
+{% block stylesheets %}
+    <!-- Puedes agregar tus hojas de estilo aquí si es necesario -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+{% endblock %}
+
+{% block content %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Puedes agregar otros scripts aquí si es necesario -->
+    
+    <style>
+        .material-symbols-outlined {
+            color: darkgray;
+        }
+        
+        #green {
+            color: #6DFF61;
+        }
+        
+        #red {
+            color: #FF6161;
+        }
+    </style>
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <!-- Puedes agregar contenido aquí si es necesario -->
+    </div>
+
+    <div class="row d-flex justify-content-center">
+        <div class="col-12 col-xl-10">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5">Administrar asignaciones</h2>
+                <div class="d-flex justify-content-end">
+
+                    <!-- Botón que abre la modal -->
+                    <button class="btn btn-outline-transparent btn-icon-only text-white d-inline-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#modal-form">
+                        <span class="material-symbols-outlined" id='green'>add_circle_outline</span>
+                    </button>
+                    
+                    <!-- Modal para agregar nueva asignatura -->
+                    <div class="modal fade" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modal-form" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Asignar asignatura</h5>
+                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Cerrar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="add-form">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div>
+                                                    <label for="user">Asignatura</label>
+                                                    <select class="form-select mb-0" id="add-subjects" name="add-subjects" aria-label="" required>
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div>
+                                                    <label for="Nivel Enseñanza">Docente</label>
+                                                    <select class="form-select mb-0" id="add-professors" name="add-professors" aria-label="" required>
+                                                        <option selected disabled>Seleccione Enseñanza</option>
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- Botón para cerrar la modal -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="btn-save-add">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% comment %} <button class="btn btn-outline-transparent btn-icon-only text-white d-inline-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#modal-default">
+                        <span class="material-symbols-outlined">info</span>
+                    </button> {% endcomment %}
+                </div>
+
+                <div class="modal fade" id="modal-edit" tabindex="-1" role="dialog" aria-labelledby="modal-edit" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Editar Asignacion</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="edit-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="edit-id" name="id">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div>
+                                                <label for="user">Asignatura</label>
+                                                <select class="form-select mb-0" id="edit-subjects" name="edit-subjects" aria-label="" required>
+                                                    
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div>
+                                                <label for="Nivel Enseñanza">Docente</label>
+                                                <select class="form-select mb-0" id="edit-professors" name="edit-professors" aria-label="" required>
+                                                    
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" id="btn-save-edit" data-dismiss="modal">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Eliminar Asignatura</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>¿Estás seguro de que deseas eliminar esta asignatura?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-danger" id="btn-confirm-delete" data-dismiss="modal">Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="table-subjets" class="table">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre D.</th>
+                                <th>Apellido D.</th>
+                                <th>Asignatura</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="table-danger table-striped">
+                            <!-- Carga de datos dataTable -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}
+{% include "includes/ajax-asignar-asignaturas.html" %}
+{% endblock javascripts %}

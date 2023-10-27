@@ -1,0 +1,290 @@
+<script>
+    $(document).ready(function() {
+        var notyf = new Notyf();
+
+        // Inicializa DataTables.js
+        var table = $('#table-subjets').DataTable({
+            ajax: '{% url "get_assignments" %}',
+            language: {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoFiltered": "(Filtrado de MAX total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'teacher__user__user_info__first_name' },
+                { data: 'teacher__user__user_info__last_name'},
+                { data: 'subject__subject' },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-t_id="' + data.teacher__user__user_info__id  + '" data-subject="' + data.subject__id + '">Editar</button>' +
+                            '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
+                    }
+                }
+            ]
+        });
+
+        // Maneja el evento clic en el botón Agregar
+        $('#btn-save-add').click(function() {
+            var asignatura = $('#add-subjects').val();
+            var docente = $('#add-professors').val();
+
+            if (asignatura.trim() == null || docente.trim() == null ) {
+                notyf.error('Todos los campos son obligatorios.');
+                return;
+            }else{
+            // Enviar datos mediante solicitud AJAX para agregar una asignatura
+                $.ajax({
+                    url: '{% url "add_assignment" %}',
+                    method: 'POST',
+                    data: {asignatura: asignatura, docente: docente, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response) {
+                        // Recarga la tabla después de agregar una asignatura
+                        table.ajax.reload();
+                        $('#modal-form').modal('hide');
+                        notyf.success(response.message);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        notyf.error(error.responseJSON.message);
+                    }
+                });
+            };
+        });
+
+        // Maneja el evento del boton editar    
+        $('#table-subjets').on('click', '.btn-edit', function() {
+            var id = $(this).data('id');
+            var subject = $(this).data('subject');
+            var teacher = $(this).data('t_id');
+
+            // ajax para obtener los datos de la asignatura y select 2 
+            $.ajax({
+            
+                url: '{% url "get_subjects" %}',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response){
+                    // Obtiene el elemento select
+                    var select = $('#edit-subjects');
+        
+                    // Vacía el select para evitar duplicados
+                    select.empty();
+        
+                    // Agrega las opciones desde la respuesta JSON y se recorren
+                    response.data.forEach(function(option) {
+                        select.append($('<option>', {
+                            value: option.id,
+                            text: option.subject
+                        }));
+                });
+        
+                // Inicializa Select2
+                select.select2({
+                    placeholder: 'Seleccione una asignatura',
+                    dropdownParent: $('#modal-edit'),
+                    // se indica que utilizara el css de bootstrap-5
+                    theme: "bootstrap-5",
+                });
+                select.val(subject).trigger('change');
+            },
+            })
+
+            // ajax para obtener los datos del docente y select 2
+            $.ajax({
+            
+                url: '{% url "get_docents" %}',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response){
+                    // Obtiene el elemento select
+                    var select = $('#edit-professors');
+        
+                    // Vacía el select para evitar duplicados
+                    select.empty();
+        
+                    // Agrega las opciones desde la respuesta JSON y se recorren
+                    response.data.forEach(function(option) {
+                        select.append($('<option>', {
+                            value: option.id,
+                            text: option.first_name + ' ' + option.last_name
+                        }));
+                });
+        
+                // Inicializa Select2
+                select.select2({
+                    placeholder: 'Seleccione un Docente',
+                    dropdownParent: $('#modal-edit'),
+                    // se indica que utilizara el css de bootstrap-5
+                    theme: "bootstrap-5",
+                });
+                select.val(teacher).trigger('change');
+            },
+            })
+
+            $('#edit-id').val(id);
+        });
+
+      
+        // Maneja el evento clic en el botón Guardar Cambios (Edición)
+        $('#btn-save-edit').click(function() {
+            var id = $('#edit-id').val();
+            var asignatura = $('#edit-subjects').val();
+            var docente = $('#edit-professors').val();
+            
+            if (asignatura == null || docente == null) {
+                notyf.error('Todos los campos son obligatorios.');
+                return;
+            }else{
+                 // Enviar datos mediante solicitud AJAX para editar un asignatura
+                $.ajax({
+                    url: '{% url "edit_assignment" %}',
+                    method: 'POST',
+                    data: {id: id, asignatura: asignatura, docente: docente, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response) {
+                        // Recarga la tabla después de editar un asignatura
+                        table.ajax.reload();
+                        $('#modal-edit').modal('hide');
+                        notyf.success(response.message);
+                    },
+                    error: function(error) {
+                        notyf.error(error.responseJSON.message);
+                    }
+                });
+            }
+        });
+
+        // Maneja el evento clic en el botón Eliminar
+        $('#table-subjets').on('click', '.btn-delete', function() {
+            var id = $(this).data('id');
+            // Configura el botón Eliminar de la modal de eliminación para enviar una solicitud AJAX de eliminación
+            $('#btn-confirm-delete').data('id', id);
+        });
+
+        // Maneja el evento clic en el botón Eliminar de la modal de eliminación
+        $('#btn-confirm-delete').click(function() {
+            var id = $(this).data('id');
+
+            // Enviar datos mediante solicitud AJAX para eliminar una asignatura
+            $.ajax({
+                url: '{% url "delete_assignment" %}',
+                method: 'POST',
+                data: {id: id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: 'json',
+                success: function(response) {
+                    // Recarga la tabla después de eliminar una asignatura
+                    table.ajax.reload();
+                    $('#modal-delete').modal('hide');
+                    notyf.success(response.message);
+                },
+                error: function(error) {
+                    notyf.error(error.responseJSON.message);
+                }
+            });
+        });
+    });
+
+    // Select2 para el campo de selección de docentes
+
+    $.ajax({
+        url: '{% url "get_docents" %}',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response){
+          // Obtiene el elemento select
+        var select = $('#add-professors');
+
+        // Vacía el select para evitar duplicados
+        select.empty();
+        // Agrega las opciones desde la respuesta JSON
+        response.data.forEach(function(option) {
+            select.append($('<option>', {
+                value: option.id,
+                text: option.first_name + ' ' + option.last_name
+            }));
+            /**
+              *! cambiar los ids y mandarlos por las views y funcaria
+            **/
+        });
+
+        // Inicializa Select2
+        select.select2({
+            placeholder: 'Seleccione un Docente',
+            dropdownParent: $('#modal-form'),
+            // se indica que utilizara el css de bootstrap-5
+            theme: "bootstrap-5",
+        });
+    },
+    error: function(error) {
+        console.log(error);
+    }
+
+    });
+
+    // Select2 para el campo de selección de asignaturas
+    $.ajax({
+        url: '{% url "get_subjects" %}',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response){
+            // Obtiene el elemento select
+            var select = $('#add-subjects');
+
+            // Vacía el select para evitar duplicados
+            select.empty();
+
+            // Agrega las opciones desde la respuesta JSON y se recorren
+            response.data.forEach(function(option) {
+                select.append($('<option>', {
+                    value: option.id,
+                    text: option.subject
+                }));
+        });
+
+        // Inicializa Select2
+        select.select2({
+            placeholder: 'Seleccione un curso',
+            dropdownParent: $('#modal-form'),
+            // se indica que utilizara el css de bootstrap-5
+            theme: "bootstrap-5",
+        });
+    },
+    error: function(error) {
+        console.log(error);
+    }
+
+    });
+
+
+   
+
+    
+    
+    
+
+    /**
+        * !Cambiar asignaturas agregando el curso a cada 1 posiblemente borrar nivel si es basica o media
+        * !Agregar Cursos a las asignaturas
+    **/
+    </script>
+
+
+

@@ -1,0 +1,129 @@
+<script>
+    $(document).ready(function() {
+        var notyf = new Notyf();
+
+        // Inicializa DataTables.js
+        var table = $('#table-cursos').DataTable({
+            ajax: '{% url "get_courses" %}',
+            language: {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoFiltered": "(Filtrado de MAX total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'course' },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-course="' + data.course + '">Editar</button>' +
+                            '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
+                    }
+                }
+            ]
+        });
+
+        // Maneja el evento clic en el botón Agregar
+        $('#btn-save-add').click(function() {
+            var course = $('#add-course').val();
+            if (course.trim() == '') {
+                notyf.error('El campo Curso es obligatorio.');
+                return;
+            }else{
+            // Enviar datos mediante solicitud AJAX para agregar un curso
+                $.ajax({
+                    url: '{% url "add_course" %}',
+                    method: 'POST',
+                    data: {course: course, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response) {
+                        // Recarga la tabla después de agregar un curso
+                        table.ajax.reload();
+                        $('#modal-form').modal('hide');
+                        notyf.success(response.message);
+                    },
+                    error: function(error) {
+                        notyf.error(error.responseJSON.message);
+                    }
+                });
+            };
+        });
+
+        // Maneja el evento clic en el botón Editar
+        $('#table-cursos').on('click', '.btn-edit', function() {
+            var id = $(this).data('id');
+            var course = $(this).data('course');
+            $('#edit-id').val(id);
+            $('#edit-course').val(course);
+        });
+
+        // Maneja el evento clic en el botón Guardar Cambios (Edición)
+        $('#btn-save-edit').click(function() {
+            var id = $('#edit-id').val();
+            var course = $('#edit-course').val();
+
+            // Enviar datos mediante solicitud AJAX para editar un curso
+            $.ajax({
+                url: '{% url "edit_course" %}',
+                method: 'POST',
+                data: {id: id, course: course, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: 'json',
+                success: function(response) {
+                    // Recarga la tabla después de editar un curso
+                    table.ajax.reload();
+                    $('#modal-edit').modal('hide');
+                    notyf.success(response.message);
+                },
+                error: function(error) {
+                    console.log(error);
+                    notyf.error(error.responseJSON.message);
+                }
+            });
+        });
+
+        // Maneja el evento clic en el botón Eliminar
+        $('#table-cursos').on('click', '.btn-delete', function() {
+            var id = $(this).data('id');
+            // Configura el botón Eliminar de la modal de eliminación para enviar una solicitud AJAX de eliminación
+            $('#btn-confirm-delete').data('id', id);
+        });
+
+        // Maneja el evento clic en el botón Eliminar de la modal de eliminación
+        $('#btn-confirm-delete').click(function() {
+            var id = $(this).data('id');
+
+            // Enviar datos mediante solicitud AJAX para eliminar un curso
+            $.ajax({
+                url: '{% url "delete_course" %}',
+                method: 'POST',
+                data: {id: id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: 'json',
+                success: function(response) {
+                    // Recarga la tabla después de eliminar un curso
+                    table.ajax.reload();
+                    $('#modal-delete').modal('hide');
+                    notyf.success(response.message);
+                },
+                error: function(error) {
+                    console.log(error);
+                    notyf.error(error.responseJSON.message);
+                }
+            });
+        });
+    });
+    </script>

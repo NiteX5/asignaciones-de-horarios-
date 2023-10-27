@@ -1,0 +1,178 @@
+<script>
+    $(document).ready(function() {
+        var notyf = new Notyf();
+        // Inicializa DataTables.js
+        var table = $('#table-usuarios').DataTable({
+            ajax: '{% url "get_users" %}',
+            language: {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                "infoFiltered": "(Filtrado de MAX total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Entradas",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            columns: [
+            { data: 'id'},
+            { data: 'user__username' },
+            { data: 'first_name' },
+            { data: 'last_name' },
+            { data: 'email' },
+            { data: 'phone_number' },
+            { data: 'departament' },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-user="' + data.user__username + '" data-name="' + data.first_name + '" data-last_name="' + data.last_name + '" data-email="' + data.email + '" data-phone_number="' + data.phone_number + '" data-departament="' + data.departament + '">Editar</button>' +
+                        '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
+                }
+            }
+            ]
+        });
+
+        // Maneja el evento clic en el botón Agregar
+        $('#btn-save-add').click(function() {
+            var nomusu = $('#user').val();
+            var nombre = $('#first_name').val();
+            var apellido = $('#last_name').val();
+            var correo = $('#email').val();
+            var telefono = $('#phone').val();
+            var pass1 = $('#password').val();
+            var pass2 = $('#password-confirm').val();
+            var departamento = $('#departament').val();
+            if (nomusu.trim() == '' && pass1.trim() == '' && pass2.trim() == '' && nombre.trim() == '' && apellido.trim() == '' && correo.trim() == '' && telefono.trim() == '' && departamento.trim() == '') {
+                notyf.error('Porfavor complete todos los campos.');
+                return;
+            }else if (pass1 != pass2) {
+                notyf.error('Las contraseñas no coinciden');
+                return;
+            }else{
+            // Enviar datos mediante solicitud AJAX para agregar un curso
+                $.ajax({
+                    url: '{% url "add_user" %}',
+                    method: 'POST',
+                    data: {username : nomusu, password: pass1, departament : departamento , phone_number : telefono, email:correo , last_name :  apellido ,first_name : nombre, password: pass1, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response) {
+                        // Recarga la tabla después de agregar un curso
+                        table.ajax.reload();
+                        $('#modal-form').modal('hide');
+                        notyf.success(response.message);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        notyf.error(error.responseJSON.message);
+                    }
+                });
+            };
+        });
+
+        // Maneja el evento clic en el botón Editar
+        $('#table-usuarios').on('click', '.btn-edit', function() {
+            var id = $(this).data('id');
+            var user = $(this).data('user');
+            var pass1 = $(this).data('non-changed');
+            var pass2 = $(this).data('non-changed');
+            var name = $(this).data('name');
+            var last_name = $(this).data('last_name');
+            var email = $(this).data('email');
+            var phone = $(this).data('phone_number');
+            var departament = $(this).data('departament');
+
+            $('#edit-id').val(id);
+            $('#edit-user').val(user);
+            $('#edit-first_name').val(name);
+            $('#edit-last_name').val(last_name);
+            $('#edit-phone').val(phone);
+            $('#edit-email').val(email);
+            $('#edit-departament').val(departament);
+        });
+
+        // Maneja el evento clic en el botón Guardar Cambios (Edición)
+        $('#btn-save-edit').click(function() {
+            var id = $('#edit-id').val();
+            var user = $('#edit-user').val();
+            var name = $('#edit-first_name').val();
+            var last_name = $('#edit-last_name').val();
+            var email = $('#edit-email').val();
+            var phone = $('#edit-phone').val();
+            var departament = $('#edit-departament').val();
+            var pass1 = $('#edit-password').val();
+            var pass2 = $('#edit-password-confirm').val();
+
+            if (pass1 != pass2) {
+                notyf.error('Las contraseñas no coinciden');
+                return;
+            }else if ( name.trim() == '' || last_name.trim() == '' || email.trim() == '' || phone.trim() == '' || departament.trim() == '') {
+                notyf.error('Porfavor complete todos los campos.');
+                return;
+            }else{
+                $.ajax({
+                    url: '{% url "edit_user" %}',
+                    method: 'POST',
+                    data: {id: id, username : user,password : pass1, departament : departament , phone_number : phone, email:email , last_name :  last_name ,first_name : name, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response) {
+                        // Recarga la tabla después de editar un curso
+                        table.ajax.reload();
+                        $('#edit-id').val();
+                        $('#edit-user').val();
+                        $('#edit-first_name').val();
+                        $('#edit-last_name').val();
+                        $('#edit-phone').val();
+                        $('#edit-email').val();
+                        $('#edit-departament').val();
+                        $('#modal-edit').modal('hide');
+                        notyf.success(response.message);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        notyf.error(error.responseJSON.message);
+                    }
+                });
+            };
+        });
+
+        // Maneja el evento clic en el botón Eliminar
+        $('#table-usuarios').on('click', '.btn-delete', function() {
+            var id = $(this).data('id');
+            // Configura el botón Eliminar de la modal de eliminación para enviar una solicitud AJAX de eliminación
+            $('#btn-confirm-delete').data('id', id);
+        });
+
+        // Maneja el evento clic en el botón Eliminar de la modal de eliminación
+        $('#btn-confirm-delete').click(function() {
+            var id = $(this).data('id');
+
+            // Enviar datos mediante solicitud AJAX para eliminar un curso
+            $.ajax({
+                url: '{% url "delete_user" %}',
+                method: 'POST',
+                data: {id: id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                dataType: 'json',
+                success: function(response) {
+                    // Recarga la tabla después de eliminar un curso
+                    table.ajax.reload();
+                    $('#modal-delete').modal('hide');
+                    notyf.success(response.message);
+                },
+                error: function(error) {
+                    console.log(error);
+                    notyf.error(error.responseJSON.message);
+                }
+            });
+        });
+    });
+    </script>

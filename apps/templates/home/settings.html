@@ -1,0 +1,114 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="col-12 col-xl-8">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">Informacion personal</h2>
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div>
+                                <label for="first_name">Nombre</label>
+                                <input class="form-control" id="first_name" type="text" placeholder="Joselito" disabled>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div>
+                                <label for="last_name">Apellido</label>
+                                <input class="form-control" id="last_name" type="text" placeholder="Alcachofa" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3">
+                            <label for="birthday">Fecha nacimiento</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <input data-datepicker="" class="form-control" id="birthday" type="text" placeholder="15/05/1990" disabled>                                               
+                              </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gender">Genero</label>
+                            <select class="form-select mb-0" id="gender" aria-label="Gender select example" disabled>
+                                <option selected>Genero</option>
+                                <option value="1">Femenino</option>
+                                <option value="2" selected>Masculino</option >
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input class="form-control" id="email" type="email" placeholder="joselito.alcachofa@lautaro.cl" value="{{ request.user.email }}" readonly disabled> 
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="phone">Telefono</label>
+                                <input class="form-control" id="phone" type="number" placeholder="+56973654765" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="h5 my-4">Direccion</h2>
+                    <div class="row">
+                        <div class="col-sm-9 mb-3">
+                            <div class="form-group">
+                                <label for="address">Calle</label>
+                                <input class="form-control" id="address" type="text" placeholder="Example" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-group">
+                                <label for="number">Numero</label>
+                                <input class="form-control" id="number" type="number" placeholder="666." disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 mb-3">
+                            <div class="form-group">
+                                <label for="city">Cuidad</label>
+                                <input class="form-control" id="city" type="text" placeholder="Codegua" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 mb-3">
+                            <label for="state">Region</label>
+                            <select class="form-select w-100 mb-0" id="state" name="state" aria-label="State select example" disabled>
+                                <option selected>Region</option>
+                                <option value="1" selected>Codegua</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="zip">Codigo postal</label>
+                                <input class="form-control" id="zip" type="tel" placeholder="558" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+            
+        </div>
+        
+    
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

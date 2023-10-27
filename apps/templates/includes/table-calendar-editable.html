@@ -1,0 +1,51 @@
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var containerEl = document.getElementById("external-events-list");
+      new FullCalendar.Draggable(containerEl, {
+        itemSelector: ".fc-event",
+        eventData: function (eventEl) {
+          var event = document.getElementById('envent');
+          var json_event = event1.getAttribute("data-event");
+          var event_array = JSON.parse(json_event);
+          var duration = event_array['duration'];
+          var event_title = event_array['title'];
+          return {
+              title: event_title,
+              duration: duration,
+          };
+        },
+      });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+      // Initialize the external events -- for more info please visit the official site: https://fullcalendar.io/demos
+  
+      // initialize the calendar -- for more info please visit the official site: https://fullcalendar.io/demos
+      var calendarEl = document.getElementById("kt_docs_fullcalendar_drag");
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "timeGridWeek",
+        headerToolbar: false,
+        droppable: true,
+        selectable: true,
+        editable: true,
+        allDaySlot: false,
+        slotMinTime: "08:00:00",
+        slotMaxTime: "18:00:00",
+        slotDuration: "00:15",
+        slotLabelInterval: "00:15",
+        eventOverlap: false,
+        contentHeight: 'auto',
+        hiddenDays: [0, 6],
+        drop: function (arg) {
+          arg.draggedEl.parentNode.removeChild(arg.draggedEl);
+          
+        },
+        
+        
+        
+      });
+  
+      calendar.setOption('height', 250);
+      calendar.render();
+    });
+  </script>
