@@ -46,19 +46,128 @@
                     </div>
 
                     <!-- Modal para agregar nueva asignatura -->
-                    <div class="modal fade" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modal-form"
-                        aria-hidden="true">
-                        <!-- Contenido del modal aquí -->
+                    <div class="modal fade" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modal-form" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Agregar Asignatura</h5>
+                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Cerrar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="add-form">
+                                        {% csrf_token %}
+                                        
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <div>
+                                                        <label for="add-asignatura">asignatura:</label>
+                                                        <input type="text" class="form-control" id="add-asignatura" name="Asignatura" placeholder="Lenguaje" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div>
+                                                        <label for="add-prefijo">Prefijo:</label>
+                                                        <input type="text" class="form-control" id="add-prefix" name="Prefix" placeholder="L" required>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <div>
+                                                    <label for="user">Curso</label>
+                                                    <select class="form-select mb-0" id="add-course" name="add-course" aria-label="" required>
+                                                        <option disabled selected>Seleccione Curso</option>
+                                                        <option value="TodoBasica">Toda la Enseñansa basica</option>
+                                                        <option value="TodoMedia">Toda la Enseñansa Media</option>
+                                                    </select>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- Botón para cerrar la modal -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="btn-save-add">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="modal fade" id="modal-edit" tabindex="-1" role="dialog" aria-labelledby="modal-edit"
-                        aria-hidden="true">
-                        <!-- Contenido del modal de edición aquí -->
+                    <div class="modal fade" id="modal-edit" tabindex="-1" role="dialog" aria-labelledby="modal-edit" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Editar Usuario</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="edit-form">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <div>
+                                                        <label for="add-asignatura">asignatura:</label>
+                                                        <input type="text" class="form-control" id="edit-asignatura" name="Asignatura" placeholder="Lenguaje" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <div>
+                                                        <label for="add-prefijo">Prefijo:</label>
+                                                        <input type="text" class="form-control" id="edit-prefix" name="Prefix" placeholder="L" required>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <div>
+                                                    <label for="user">Curso</label>
+                                                    <select class="form-select mb-0" id="edit-course" name="edit-course" aria-label="" required>
+                                                        
+                                                    </select>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="btn-save-edit" data-dismiss="modal">Guardar Cambios</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete"
-                        aria-hidden="true">
-                        <!-- Contenido del modal de eliminación aquí -->
+                    <div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Eliminar Curso</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>¿Estás seguro de que deseas eliminar esta Asignatura?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-danger" id="btn-confirm-delete" data-dismiss="modal">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="table-responsive">

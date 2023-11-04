@@ -39,6 +39,9 @@ urlpatterns = [
     path('edit_assignment/', views.edit_assignment, name='edit_assignment'),
     path('delete_assignment/', views.delete_assignment, name='delete_assignment'),
 
+    # ajax Schedule
+    path('get_subjects_assignament/<int:id>', views.get_subjects_assignament, name='get_subjects_assignament'),
+
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

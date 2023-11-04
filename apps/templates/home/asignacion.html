@@ -1,6 +1,7 @@
 {% extends "layouts/base.html" %} {% block title %} Calendarios {% endblock %}
 
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap');
   body {
@@ -60,13 +61,17 @@
 <h4 class="mb-3">Asignaturas</h4>
 
 <div class="container-fluid">
+  <div class="row d-flex justify-content-center pb-5">
+    <select class="form-select mb-0" id="add-professors" name="add-professors" aria-label="" required>
+      <option selected disabled>Seleccione Docente</option>
+      
+    </select>
+  </div>
   <div class="row ">
       <div class="col-md-2 list-group border border-dark Regular shadow pt-2 pl-2">
-              <div id="external-events-list">
-                <div class="fc-event" id="event1" data-event='{ "title": "event 1 custom title", "duration": "00:45", "color": "#f00" }'>
-                   <p class="list-group-item list-group-item-action">My Event 1</p>
-                </div>
-              </div>
+        <div id="external-events-list">
+          
+        </div>
       </div>
       <div class="col-md-10">
         <div class="customCalendar">
@@ -80,8 +85,10 @@
 
 
 
-{% include 'includes/table-calendar-editable.html' %}
+
 
 {% endblock content %}
+{% block javascripts %}
+{% include 'includes/table-calendar-editable.html' %}
+{% endblock javascripts %}
 
-{% block javascripts %}{% endblock javascripts %}

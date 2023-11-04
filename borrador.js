@@ -1,54 +1,16 @@
-<script>
-  $.ajax({
-    url: '{% url "get_docents" %}',
-    method: 'GET',
-    dataType: 'json',
-    success: function(response){
-      // Obtiene el elemento select
-    var select = $('#add-professors');
-    // Agrega las opciones desde la respuesta JSON
-    response.data.forEach(function(option) {
-        select.append($('<option>', {
-            value: option.id,
-            text: option.first_name + ' ' + option.last_name
-        }));
-    });
-
-    // Inicializa Select2
-    select.select2({
-        placeholder: 'Seleccione un Docente',
-        // se indica que utilizara el css de bootstrap-5
-        theme: "bootstrap-5",
-    });
-  },
-  error: function(error) {
-    console.log(error);
-  }
-
-  });
 
   
-
-  $("#add-professors").on('change', function(){
-    var id = $("#add-professors").val();
-    console.log(id);
-
+  document.addEventListener("DOMContentLoaded", function () {
     var containerEl = document.getElementById("external-events-list");
     var calendarEl = document.getElementById("kt_docs_fullcalendar_drag");
     var calendar = null;
 
-    function clearEventList() {
-      while (containerEl.firstChild) {
-          containerEl.removeChild(containerEl.firstChild);
-      }
-    }
-
     // Hacer una solicitud Ajax para obtener los eventos
-    $.get('/get_subjects_assignament/'+id, function (data) {
+    $.get('/get_subjects/', function (data) {
         var events = data.data;
-        clearEventList();
+
         events.forEach(function (event) {
-            var title = event.subject__subject + " - " + event.subject__course__course;
+            var title = event.subject + " - " + event.course__course;
             var eventId = event.id;
             var courseId = event.course__id;
             var duration = "00:45";
@@ -108,10 +70,8 @@
                 arg.draggedEl.remove();
             },
         });
-        
+
         calendar.setOption('height', 250);
         calendar.render();
     });
-  });
-
-</script>
+});

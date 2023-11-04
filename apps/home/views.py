@@ -249,7 +249,6 @@ def get_assignments(request):
     assignments = Assignments.objects.values('id', 'teacher__user__username', 'teacher__user__user_info__first_name',
                      'teacher__user__user_info__last_name', 'teacher__user__user_info__id', 'subject__subject', 'subject__id')
     return JsonResponse({'data': list(assignments)})
-
 @login_required(login_url="/login/")
 def add_assignment(request):
     if request.method == 'POST':
@@ -290,3 +289,12 @@ def delete_assignment(request):
         return JsonResponse({'message': 'Asignacion eliminada exitosamente'})
     else:
         return JsonResponse({'message': 'error'})
+    
+
+# crud horarios
+
+@login_required(login_url="/login/")
+def get_subjects_assignament(request, id):
+    subjects = Assignments.objects.filter(teacher=id).values('subject__id', 'subject__subject', 'subject__course__course', 'subject__course__id')
+    print(subjects[0])
+    return JsonResponse({'data': list(subjects)})

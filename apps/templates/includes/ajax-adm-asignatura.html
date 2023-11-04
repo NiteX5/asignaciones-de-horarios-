@@ -1,218 +1,218 @@
 <script>
-    $(document).ready(function() {
-        var notyf = new Notyf();
-
-        // Inicializa DataTables.js
-        var table = $('#table-subjets').DataTable({
-            ajax: '{% url "get_subjects" %}',
-            language: {
-                "decimal": "",
-                "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-                "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
-                "infoFiltered": "(Filtrado de MAX total entradas)",
-                "infoPostFix": "",
-                "thousands": ",",
-                "lengthMenu": "Mostrar _MENU_ Entradas",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscar:",
-                "zeroRecords": "Sin resultados encontrados",
-                "paginate": {
-                    "first": "Primero",
-                    "last": "Ultimo",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
-                }
-            },
-            columns: [
-                { data: 'id' },
-                { data: 'subject' },
-                { data: 'course__course'},
-                { data: 'prefix'},
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-asignatura="' + data.subject + '" data-nivel="' + data.course__id + '" data-prefix="' + data.prefix + '">Editar</button>' +
-                            '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
-                    }
-                }
-            ]
-        });
-
-        // Maneja el evento clic en el botón Agregar
-        $('#btn-save-add').click(function() {
-            var asignatura = $('#add-asignatura').val();
-            var nivel = $('#add-course').val();
-            var prefijo = $('#add-prefix').val();
-            console.log(asignatura, nivel, prefijo);
-
-            if (asignatura.trim() == ''|| prefijo.trim() == '') {
-                notyf.error('Todos los campos son obligatorios.');
-                return;
-            }else if (nivel == null){
-                notyf.error('Seleccione una enseñanza.');
-                return;            
-            }else{
-            // Enviar datos mediante solicitud AJAX para agregar una asignatura
-                $.ajax({
-                    url: '{% url "add_subject" %}',
-                    method: 'POST',
-                    data: {asignatura: asignatura, nivel: nivel, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
-                    dataType: 'json',
-                    success: function(response) {
-                        // Recarga la tabla después de agregar una asignatura
-                        table.ajax.reload();
-                        $('#modal-form').modal('hide');
-                        $('#add-asignatura').val('');
-                        $('#add-ensenanza').val('Seleccione Enseñanza');
-                        $('#add-prefix').val('');
-                        notyf.success(response.message);
-                    },
-                    error: function(error) {
-                        console.log(error);
-                        notyf.error(error.responseJSON.message);
-                    }
-                });
-            };
-        });
-
-        // Maneja el evento clic en el botón Editar
-        $('#table-subjets').on('click', '.btn-edit', function() {
-            var id = $(this).data('id');
-            var asignatura = $(this).data('asignatura');
-            var nivel = $(this).data('nivel');
-            var prefijo = $(this).data('prefix');
-            $.ajax({
-                url: '{% url "get_courses" %}',
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-
-                    // se obtiene el elemento select o combobox
-                    var select = $('#edit-course');
-
-                    // se recorre el arreglo de datos
-                    response.data.forEach(function(option) {
-                        select.append($('<option>', {
-                            value: option.id,
-                            text: option.course
-                        }));
-                    });
-
-                    // Inicializa select2
-                    select.select2({
-                        placeholder: 'Seleccione un curso',
-                        dropdownParent: $('#modal-edit'),
-                        // se indica que utilizara el css de bootstrap-5
-                        theme: "bootstrap-5"
-                    });
-        
-                    // Establece el valor predeterminado (nivel) en el campo select2
-                    select.val(nivel).trigger('change'); // Trigger 'change' para actualizar la selección
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-            $('#edit-id').val(id);
-            $('#edit-asignatura').val(asignatura);
-            $('#edit-prefix').val(prefijo);
-        });
-
-        // Maneja el evento clic en el botón Guardar Cambios (Edición)
-        $('#btn-save-edit').click(function() {
-            var id = $('#edit-id').val();
-            var asignatura = $('#edit-asignatura').val();
-            var nivel = $('#edit-ensenanza').val();
-            var prefijo = $('#edit-prefix').val();
-            
-            if (asignatura.trim() == ''|| prefijo.trim() == '' || nivel == null) {
-                notyf.error('Todos los campos son obligatorios.');
-                return;
-            }else{
-                 // Enviar datos mediante solicitud AJAX para editar un asignatura
-                $.ajax({
-                    url: '{% url "edit_subjects" %}',
-                    method: 'POST',
-                    data: {id: id, asignatura: asignatura, nivel: nivel, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
-                    dataType: 'json',
-                    success: function(response) {
-                        // Recarga la tabla después de editar un asignatura
-                        table.ajax.reload();
-                        $('#modal-edit').modal('hide');
-                        notyf.success(response.message);
-                    },
-                    error: function(error) {
-                        console.log(error);
-                        notyf.error(error.responseJSON.message);
-                    }
-                });
-            }
-        });
-
-        // Maneja el evento clic en el botón Eliminar
-        $('#table-subjets').on('click', '.btn-delete', function() {
-            var id = $(this).data('id');
-            // Configura el botón Eliminar de la modal de eliminación para enviar una solicitud AJAX de eliminación
-            $('#btn-confirm-delete').data('id', id);
-        });
-
-        // Maneja el evento clic en el botón Eliminar de la modal de eliminación
-        $('#btn-confirm-delete').click(function() {
-            var id = $(this).data('id');
-
-            // Enviar datos mediante solicitud AJAX para eliminar una asignatura
-            $.ajax({
-                url: '{% url "delete_subjects" %}',
-                method: 'POST',
-                data: {id: id, csrfmiddlewaretoken: '{{ csrf_token }}'},
-                dataType: 'json',
-                success: function(response) {
-                    // Recarga la tabla después de eliminar una asignatura
-                    table.ajax.reload();
-                    $('#modal-delete').modal('hide');
-                    notyf.success(response.message);
-                },
-                error: function(error) {
-                    console.log(error);
-                    notyf.error(error.responseJSON.message);
-                }
-            });
-        });
-    });
-
-    // select2 para el campo de curso
-    $.ajax({
-        url: '{% url "get_courses" %}',
-        method: 'GET',
-        dataType: 'json',
-        success: function(response) {
-
-            // se obtiene el elemnto select o combobox
-            var select = $('#add-course');
-
-            // se recorre el arreglo de datos
-            response.data.forEach(function(option) {
-                select.append($('<option>', {
-                    value: option.id,
-                    text: option.course
-                }));
-            });
-
-            // Inicializa select2
-            select.select2({
-                placeholder: 'Seleccione un curso',
-                dropdownParent: $('#modal-form'),
-                // se indica que utilizara el css de bootstrap-5
-                theme: "bootstrap-5",
-            });
-        },
-        error: function(error) {
-            console.log(error);
-        }
-        
-    });
-
+        $(document).ready(function() {
+            var notyf = new Notyf();
     
-    </script>
+            // Inicializa DataTables.js
+            var table = $('#table-subjets').DataTable({
+                ajax: '{% url "get_subjects" %}',
+                language: {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                    "infoFiltered": "(Filtrado de MAX total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                columns: [
+                    { data: 'id' },
+                    { data: 'subject' },
+                    { data: 'course__course'},
+                    { data: 'prefix'},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-asignatura="' + data.subject + '" data-nivel="' + data.course__id + '" data-prefix="' + data.prefix + '">Editar</button>' +
+                                '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
+                        }
+                    }
+                ]
+            });
+    
+            // Maneja el evento clic en el botón Agregar
+            $('#btn-save-add').click(function() {
+                var asignatura = $('#add-asignatura').val();
+                var nivel = $('#add-course').val();
+                var prefijo = $('#add-prefix').val();
+                console.log(asignatura, nivel, prefijo);
+    
+                if (asignatura.trim() == ''|| prefijo.trim() == '') {
+                    notyf.error('Todos los campos son obligatorios.');
+                    return;
+                }else if (nivel == null){
+                    notyf.error('Seleccione una enseñanza.');
+                    return;            
+                }else{
+                // Enviar datos mediante solicitud AJAX para agregar una asignatura
+                    $.ajax({
+                        url: '{% url "add_subject" %}',
+                        method: 'POST',
+                        data: {asignatura: asignatura, nivel: nivel, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        dataType: 'json',
+                        success: function(response) {
+                            // Recarga la tabla después de agregar una asignatura
+                            table.ajax.reload();
+                            $('#modal-form').modal('hide');
+                            $('#add-asignatura').val('');
+                            $('#add-ensenanza').val('Seleccione Enseñanza');
+                            $('#add-prefix').val('');
+                            notyf.success(response.message);
+                        },
+                        error: function(error) {
+                            console.log(error);
+                            notyf.error(error.responseJSON.message);
+                        }
+                    });
+                };
+            });
+    
+            // Maneja el evento clic en el botón Editar
+            $('#table-subjets').on('click', '.btn-edit', function() {
+                var id = $(this).data('id');
+                var asignatura = $(this).data('asignatura');
+                var nivel = $(this).data('nivel');
+                var prefijo = $(this).data('prefix');
+                $.ajax({
+                    url: '{% url "get_courses" %}',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+    
+                        // se obtiene el elemento select o combobox
+                        var select = $('#edit-course');
+    
+                        // se recorre el arreglo de datos
+                        response.data.forEach(function(option) {
+                            select.append($('<option>', {
+                                value: option.id,
+                                text: option.course
+                            }));
+                        });
+    
+                        // Inicializa select2
+                        select.select2({
+                            placeholder: 'Seleccione un curso',
+                            dropdownParent: $('#modal-edit'),
+                            // se indica que utilizara el css de bootstrap-5
+                            theme: "bootstrap-5"
+                        });
+            
+                        // Establece el valor predeterminado (nivel) en el campo select2
+                        select.val(nivel).trigger('change'); // Trigger 'change' para actualizar la selección
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+                $('#edit-id').val(id);
+                $('#edit-asignatura').val(asignatura);
+                $('#edit-prefix').val(prefijo);
+            });
+    
+            // Maneja el evento clic en el botón Guardar Cambios (Edición)
+            $('#btn-save-edit').click(function() {
+                var id = $('#edit-id').val();
+                var asignatura = $('#edit-asignatura').val();
+                var nivel = $('#edit-ensenanza').val();
+                var prefijo = $('#edit-prefix').val();
+                
+                if (asignatura.trim() == ''|| prefijo.trim() == '' || nivel == null) {
+                    notyf.error('Todos los campos son obligatorios.');
+                    return;
+                }else{
+                     // Enviar datos mediante solicitud AJAX para editar un asignatura
+                    $.ajax({
+                        url: '{% url "edit_subjects" %}',
+                        method: 'POST',
+                        data: {id: id, asignatura: asignatura, nivel: nivel, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        dataType: 'json',
+                        success: function(response) {
+                            // Recarga la tabla después de editar un asignatura
+                            table.ajax.reload();
+                            $('#modal-edit').modal('hide');
+                            notyf.success(response.message);
+                        },
+                        error: function(error) {
+                            console.log(error);
+                            notyf.error(error.responseJSON.message);
+                        }
+                    });
+                }
+            });
+    
+            // Maneja el evento clic en el botón Eliminar
+            $('#table-subjets').on('click', '.btn-delete', function() {
+                var id = $(this).data('id');
+                // Configura el botón Eliminar de la modal de eliminación para enviar una solicitud AJAX de eliminación
+                $('#btn-confirm-delete').data('id', id);
+            });
+    
+            // Maneja el evento clic en el botón Eliminar de la modal de eliminación
+            $('#btn-confirm-delete').click(function() {
+                var id = $(this).data('id');
+    
+                // Enviar datos mediante solicitud AJAX para eliminar una asignatura
+                $.ajax({
+                    url: '{% url "delete_subjects" %}',
+                    method: 'POST',
+                    data: {id: id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    dataType: 'json',
+                    success: function(response) {
+                        // Recarga la tabla después de eliminar una asignatura
+                        table.ajax.reload();
+                        $('#modal-delete').modal('hide');
+                        notyf.success(response.message);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        notyf.error(error.responseJSON.message);
+                    }
+                });
+            });
+        });
+    
+        // select2 para el campo de curso
+        $.ajax({
+            url: '{% url "get_courses" %}',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+    
+                // se obtiene el elemnto select o combobox
+                var select = $('#add-course');
+    
+                // se recorre el arreglo de datos
+                response.data.forEach(function(option) {
+                    select.append($('<option>', {
+                        value: option.id,
+                        text: option.course
+                    }));
+                });
+    
+                // Inicializa select2
+                select.select2({
+                    placeholder: 'Seleccione un curso',
+                    dropdownParent: $('#modal-form'),
+                    // se indica que utilizara el css de bootstrap-5
+                    theme: "bootstrap-5",
+                });
+            },
+            error: function(error) {
+                console.log(error);
+            }
+            
+        });
+    
+        
+</script>
