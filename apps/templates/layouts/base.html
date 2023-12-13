@@ -25,11 +25,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Two+Tone"
       rel="stylesheet">
 
-<link type="text/css" href="/static/assets/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+<link  href="/static/assets/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
 
 <link type="text/css" href="/static/assets/vendor/notyf/notyf.min.css" rel="stylesheet">
 
 <link type="text/css" href="/static/assets/css/volt.css" rel="stylesheet">
+
+<link	rel="stylesheet"	href="https://cdn.dhtmlx.com/fonts/wxi/wx-icons.css"/>
+<link rel="stylesheet" href="https://snippet.dhtmlx.com/codebase/assets/css/eventCalendar_demos.css">
+<link rel="icon" type="image/x-icon" href="/static/assets/img/favicon/logo.png">
 
 <!-- Specific Page JS goes HERE  -->    
 {% block stylesheets %}{% endblock stylesheets %}
@@ -37,7 +41,7 @@
 </head>
 <body class="min-vnhmin-vh-100">
 
-    {% if departament == "Secretaria" %}
+    {% if departament.upper == "SECRETARIA" or departament.upper == "ADMIN" %}
       {% include 'includes/sidebar.html' %}
       {% else %}
       {% include 'includes/sidebar-view.html' %}
@@ -49,9 +53,6 @@
       {% block content %}{% endblock content %} 
 
      
-
-      {% include 'includes/footer.html' %}
-
     </main>
 
   {% include 'includes/scripts.html' %}

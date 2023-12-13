@@ -41,6 +41,23 @@ urlpatterns = [
 
     # ajax Schedule
     path('get_subjects_assignament/<int:id>', views.get_subjects_assignament, name='get_subjects_assignament'),
+    path('get_courses/<int:id>', views.get_course_byId, name='get_course_id'),
+    path('save_schedule/', views.save_schedule, name='save_schedule'),
+   # Tambien ocupado en listCalerdar 
+    path('get_events/<int:id>', views.get_events, name='get_events'),
+    path('delete_event/', views.delete_event, name='delete_event'),
+    path('update_event/', views.update_event, name='update_event'),
+
+    # ajax listCalendar
+    path('get_course_listCalendar/<int:id>', views.get_course_listCalendar, name='get_course_listCalendar'),
+
+
+    # ajax settings
+        #Tambien ocupado por la vista de horario docentes
+    path('get_settings/', views.get_current_user_info, name='get_settings'),
+    path('update_settings/', views.update_settings, name='update_settings'),
+
+
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),

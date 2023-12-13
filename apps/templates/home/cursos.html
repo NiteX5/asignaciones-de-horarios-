@@ -57,9 +57,25 @@
                                 <div class="modal-body">
                                     <form id="add-form">
                                         {% csrf_token %}
-                                        <div class="form-group">
-                                            <label for="add-course">Curso:</label>
-                                            <input type="text" class="form-control" id="add-course" name="course" required>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div>
+                                                    <div class="form-group">
+                                                        <label for="add-course">Curso:</label>
+                                                        <input type="text" class="form-control" id="add-course" name="course" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div>
+                                                    <label for="Nivel Enseñanza">Enseñanza</label>
+                                                    <select class="form-select mb-0" id="add-teaching" name="add-teaching" aria-label="" required>
+                                                        <option selected disabled>Seleccione Enseñanza</option>
+                                                        <option value="Basica">Basica</option>
+                                                        <option value="Media">Media</option>
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
@@ -113,9 +129,25 @@
                                 <form id="edit-form">
                                     {% csrf_token %}
                                     <input type="hidden" id="edit-id" name="id">
-                                    <div class="form-group">
-                                        <label for="edit-course">Curso:</label>
-                                        <input type="text" class="form-control" id="edit-course" name="course">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div>
+                                                <div class="form-group">
+                                                    <label for="edit-course">Curso:</label>
+                                                    <input type="text" class="form-control" id="edit-course" name="course" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div>
+                                                <label for="Nivel Enseñanza">Enseñanza</label>
+                                                <select class="form-select mb-0" id="edit-teaching" name="edit-teaching" aria-label="" required>
+                                                    <option selected disabled>Seleccione Enseñanza</option>
+                                                    <option value="Basica">Basica</option>
+                                                    <option value="Media">Media</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -154,6 +186,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Curso</th>
+                                <th>Enseñanza</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>

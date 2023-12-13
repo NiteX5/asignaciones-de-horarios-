@@ -1,11 +1,64 @@
 <script>
-  
-  document.addEventListener("DOMContentLoaded", function () {
-    
+  $.ajax({
+    url: '{% url "get_docents" %}',
+    method: 'GET',
+    dataType: 'json',
+    success: function (response) {
+      // Obtiene el elemento select
+      var select = $('#add-professors');
+      // Agrega las opciones desde la respuesta JSON
+      response.data.forEach(function (option) {
+        select.append($('<option>', {
+          value: option.id,
+          text: option.first_name + ' ' + option.last_name
+        }));
+      });
+
+      // Inicializa Select2
+      select.select2({
+        placeholder: 'Seleccione un Docente',
+        theme: "bootstrap-5"
+      });
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  });
+
+  $.ajax({
+    url: '{% url "get_courses" %}',
+    method: 'GET',
+    dataType: 'json',
+    success: function (response) {
+      // Obtiene el elemento select
+      var select = $('#add-courses');
+      // Agrega las opciones desde la respuesta JSON
+      response.data.forEach(function (option) {
+        select.append($('<option>', {
+          value: option.id,
+          text: option.course
+        }));
+      });
+
+      // Inicializa Select2
+      select.select2({
+        placeholder: 'Seleccione un Curso',
+        theme: "bootstrap-5"
+      });
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  });
+  inicalendar = null;
+  function calendar(events){
     var calendarEl = document.getElementById("kt_docs_fullcalendar_drag");
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: "timeGridWeek",
+    
+    inicalendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'resourceTimeGridDay',
       headerToolbar: false,
+      droppable: false,
+      selectable: false,
       allDaySlot: false,
       slotMinTime: "08:00:00",
       slotMaxTime: "18:00:00",
@@ -13,11 +66,43 @@
       slotLabelInterval: "00:15",
       eventOverlap: false,
       contentHeight: 'auto',
-      hiddenDays: [0, 6],
-      
-    });
+      editable: false,
+      eventDurationEditable: false,
+      events: events,
+      views: {
+        resourceTimeGridFourDay: {
+          type: 'resourceTimeGrid',
+          duration: { days: 5 },
+          buttonText: '5 days'
+        }
+      },
+      resources: [
+        { id: 'A', title: 'Lunes' },
+        { id: 'B', title: 'Martes' },
+        { id: 'C', title: 'Miercoles' },
+        { id: 'D', title: 'Jueves' },
+        { id: 'E', title: 'Viernes' }
+      ],
+        
+      });
+  
+      inicalendar.setOption('height', 250);
+      inicalendar.render();
+  }
 
-    calendar.setOption('height', 250);
-    calendar.render();
+  $("#add-professors").on('change', function () {
+    inicalendar = null;
+    var id = $(this).val();
+    $('#add-courses').val('a');
+    var urlDataEvents = 'http://127.0.0.1:8000/get_events/' + id;
+    calendar(urlDataEvents);
+  });
+
+  $("#add-courses").on('change', function () {
+    inicalendar = null
+    var id = $(this).val();
+    $('#add-professors').val('a');
+    var urlDataEvents = 'http://127.0.0.1:8000/get_course_listCalendar/'+id;
+    calendar(urlDataEvents);
   });
 </script>

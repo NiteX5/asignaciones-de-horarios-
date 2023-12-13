@@ -62,17 +62,48 @@ border-radius:10px;}
 }
 </style>
 
-<h4 class="mb-3">Horario</h4>
 
 
-<div class="customCalendar pt-5">
-  <div id="kt_docs_fullcalendar_drag"></div>
-  </nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="text-center">Calendario de Clases</h1>
+    </div>
+  </div>
+  {% if departament.upper == "SECRETARIA" or departament.upper == "DIRECTORA" or departament == "RECTORIA" %}
+      <div class="row">
+        <div class="col-md-6">
+          <select class="form-select mb-0" id="add-professors" name="add-professors" aria-label="" >
+            <option value="a" selected disabled>Seleccione Docente</option>
+
+          </select>
+        </div>
+        <div class="col-md-6">
+          <select class="form-select mb-0" id="add-courses" name="add-courses" aria-label="">
+            <option value="a" selected disabled>Seleccione Course</option>
+
+          </select>
+        </div>
+      </div>
+  {% endif %}
+  <div class="row ">
+      <div class="col-md-12">
+        <div class="customCalendar">
+          <div id="kt_docs_fullcalendar_drag"></div>
+        </div>
+      </div>
+  </div>
 </div>
-
-{% include "includes/table-calendar-View.html" %}
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+
+{% if departament.upper == "SECRETARIA" or departament.upper == "DIRECTORA" or departament == "RECTORIA" %}
+  {% include "includes/table-calendar-View.html" %}
+{% else %}
+{% include "includes/table-calendar-docentes.html" %}
+{% endif %}
+{% endblock javascripts %}

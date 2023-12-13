@@ -52,11 +52,14 @@
             var pass1 = $('#password').val();
             var pass2 = $('#password-confirm').val();
             var departamento = $('#departament').val();
-            if (nomusu.trim() == '' && pass1.trim() == '' && pass2.trim() == '' && nombre.trim() == '' && apellido.trim() == '' && correo.trim() == '' && telefono.trim() == '' && departamento.trim() == '') {
+            console.log(departamento);
+            if (nomusu.trim() == '' || pass1.trim() == '' || pass2.trim() == '' || nombre.trim() == '' || apellido.trim() == '' || correo.trim() == '' || telefono.trim() == '') {
                 notyf.error('Porfavor complete todos los campos.');
-                return;
             }else if (pass1 != pass2) {
                 notyf.error('Las contraseñas no coinciden');
+                return;
+            }else if ( departamento == null) {
+                notyf.error('Porfavor seleccione un departemento.');
                 return;
             }else{
             // Enviar datos mediante solicitud AJAX para agregar un curso

@@ -1,7 +1,20 @@
+
 <script>
+    Coloris({
+        themeMode: 'white',
+        alpha: false
+    });
+
+    document.querySelector('#btn-save-add').addEventListener('click', e => {
+        Coloris({
+            alpha: true
+        });
+    });
+    
         $(document).ready(function() {
             var notyf = new Notyf();
-    
+
+            
             // Inicializa DataTables.js
             var table = $('#table-subjets').DataTable({
                 ajax: '{% url "get_subjects" %}',
@@ -28,12 +41,12 @@
                 columns: [
                     { data: 'id' },
                     { data: 'subject' },
-                    { data: 'course__course'},
+                    { data: 'education' },
                     { data: 'prefix'},
                     {
                         data: null,
                         render: function (data, type, row) {
-                            return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-asignatura="' + data.subject + '" data-nivel="' + data.course__id + '" data-prefix="' + data.prefix + '">Editar</button>' +
+                            return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-asignatura="' + data.subject +  '" data-teaching="' + data.teaching + +  '" data-prefix="' + data.prefix + '">Editar</button>' +
                                 '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
                         }
                     }
@@ -43,14 +56,13 @@
             // Maneja el evento clic en el botón Agregar
             $('#btn-save-add').click(function() {
                 var asignatura = $('#add-asignatura').val();
-                var nivel = $('#add-course').val();
                 var prefijo = $('#add-prefix').val();
-                console.log(asignatura, nivel, prefijo);
+                var teaching = $('#add-enseñanse').val();
     
                 if (asignatura.trim() == ''|| prefijo.trim() == '') {
                     notyf.error('Todos los campos son obligatorios.');
                     return;
-                }else if (nivel == null){
+                }else if (teaching == null){
                     notyf.error('Seleccione una enseñanza.');
                     return;            
                 }else{
@@ -58,7 +70,7 @@
                     $.ajax({
                         url: '{% url "add_subject" %}',
                         method: 'POST',
-                        data: {asignatura: asignatura, nivel: nivel, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        data: {asignatura: asignatura, teaching: teaching, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
                         dataType: 'json',
                         success: function(response) {
                             // Recarga la tabla después de agregar una asignatura
@@ -81,40 +93,9 @@
             $('#table-subjets').on('click', '.btn-edit', function() {
                 var id = $(this).data('id');
                 var asignatura = $(this).data('asignatura');
-                var nivel = $(this).data('nivel');
+                var teaching = $(this).data('teaching');
                 var prefijo = $(this).data('prefix');
-                $.ajax({
-                    url: '{% url "get_courses" %}',
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-    
-                        // se obtiene el elemento select o combobox
-                        var select = $('#edit-course');
-    
-                        // se recorre el arreglo de datos
-                        response.data.forEach(function(option) {
-                            select.append($('<option>', {
-                                value: option.id,
-                                text: option.course
-                            }));
-                        });
-    
-                        // Inicializa select2
-                        select.select2({
-                            placeholder: 'Seleccione un curso',
-                            dropdownParent: $('#modal-edit'),
-                            // se indica que utilizara el css de bootstrap-5
-                            theme: "bootstrap-5"
-                        });
-            
-                        // Establece el valor predeterminado (nivel) en el campo select2
-                        select.val(nivel).trigger('change'); // Trigger 'change' para actualizar la selección
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
+                
                 $('#edit-id').val(id);
                 $('#edit-asignatura').val(asignatura);
                 $('#edit-prefix').val(prefijo);
@@ -124,10 +105,10 @@
             $('#btn-save-edit').click(function() {
                 var id = $('#edit-id').val();
                 var asignatura = $('#edit-asignatura').val();
-                var nivel = $('#edit-ensenanza').val();
+                var teaching = $('#edit-ensenanza').val();
                 var prefijo = $('#edit-prefix').val();
                 
-                if (asignatura.trim() == ''|| prefijo.trim() == '' || nivel == null) {
+                if (asignatura.trim() == ''|| prefijo.trim() == '' || teaching == null) {
                     notyf.error('Todos los campos son obligatorios.');
                     return;
                 }else{
@@ -135,7 +116,7 @@
                     $.ajax({
                         url: '{% url "edit_subjects" %}',
                         method: 'POST',
-                        data: {id: id, asignatura: asignatura, nivel: nivel, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        data: {id: id, asignatura: asignatura, teaching: teaching, prefijo: prefijo, csrfmiddlewaretoken: '{{ csrf_token }}'},
                         dataType: 'json',
                         success: function(response) {
                             // Recarga la tabla después de editar un asignatura
@@ -182,37 +163,7 @@
             });
         });
     
-        // select2 para el campo de curso
-        $.ajax({
-            url: '{% url "get_courses" %}',
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-    
-                // se obtiene el elemnto select o combobox
-                var select = $('#add-course');
-    
-                // se recorre el arreglo de datos
-                response.data.forEach(function(option) {
-                    select.append($('<option>', {
-                        value: option.id,
-                        text: option.course
-                    }));
-                });
-    
-                // Inicializa select2
-                select.select2({
-                    placeholder: 'Seleccione un curso',
-                    dropdownParent: $('#modal-form'),
-                    // se indica que utilizara el css de bootstrap-5
-                    theme: "bootstrap-5",
-                });
-            },
-            error: function(error) {
-                console.log(error);
-            }
-            
-        });
+        
     
         
 </script>

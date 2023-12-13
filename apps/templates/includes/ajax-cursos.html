@@ -28,10 +28,11 @@
             columns: [
                 { data: 'id' },
                 { data: 'course' },
+                { data: 'education' },
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-course="' + data.course + '">Editar</button>' +
+                        return '<button type="button" class="btn btn-warning btn-edit me-3" data-toggle="modal" data-target="#modal-edit" data-id="' + data.id + '" data-course="' + data.course + '" data-teaching="' + data.education + '">Editar</button>' +
                             '<button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#modal-delete" data-id="' + data.id + '">Eliminar</button>';
                     }
                 }
@@ -41,15 +42,16 @@
         // Maneja el evento clic en el botón Agregar
         $('#btn-save-add').click(function() {
             var course = $('#add-course').val();
-            if (course.trim() == '') {
-                notyf.error('El campo Curso es obligatorio.');
+            var teaching = $('#add-teaching').val();
+            if (course.trim() == '' || course.trim() == null) {
+                notyf.error('Todos los canpos son obligatorios.');
                 return;
             }else{
             // Enviar datos mediante solicitud AJAX para agregar un curso
                 $.ajax({
                     url: '{% url "add_course" %}',
                     method: 'POST',
-                    data: {course: course, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    data: {course: course, teaching: teaching, csrfmiddlewaretoken: '{{ csrf_token }}'},
                     dataType: 'json',
                     success: function(response) {
                         // Recarga la tabla después de agregar un curso
@@ -68,20 +70,22 @@
         $('#table-cursos').on('click', '.btn-edit', function() {
             var id = $(this).data('id');
             var course = $(this).data('course');
+            var teaching = $(this).data('teaching');
             $('#edit-id').val(id);
             $('#edit-course').val(course);
+            $('#edit-teaching').val(teaching);
         });
 
         // Maneja el evento clic en el botón Guardar Cambios (Edición)
         $('#btn-save-edit').click(function() {
             var id = $('#edit-id').val();
             var course = $('#edit-course').val();
-
+            var teaching = $('#edit-teaching').val();
             // Enviar datos mediante solicitud AJAX para editar un curso
             $.ajax({
                 url: '{% url "edit_course" %}',
                 method: 'POST',
-                data: {id: id, course: course, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                data: {id: id, course: course, teaching: teaching, csrfmiddlewaretoken: '{{ csrf_token }}'},
                 dataType: 'json',
                 success: function(response) {
                     // Recarga la tabla después de editar un curso

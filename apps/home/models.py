@@ -15,20 +15,23 @@ class user_info(models.Model):
     departament = models.CharField(max_length=100, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
-
-
-class Course(models.Model):
-    id = models.AutoField(primary_key=True)
-    course = models.CharField(max_length=100, blank=True, null=True)
-
 class Subjects(models.Model):
     id = models.AutoField(primary_key=True)
     subject = models.CharField(max_length=100, blank=True, null=True)
     prefix = models.CharField(max_length=100, blank=True, null=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
+    education = models.CharField(max_length=100, blank=True, null=True)
+
+class Course(models.Model):
+    id = models.AutoField(primary_key=True)
+    course = models.CharField(max_length=100, blank=True, null=True)
+    education = models.CharField(max_length=100, blank=True, null=True)
 
 class Schedule(models.Model):
     id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    day_of_week = models.CharField(max_length=100, blank=True, null=True)
+    start = models.DateTimeField(max_length=14)
+    end = models.TimeField(auto_now=False, auto_now_add=False)
     teacher = models.ForeignKey(user_info, on_delete=models.CASCADE, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
     subject = models.ForeignKey(Subjects, on_delete=models.CASCADE, null=True, blank=True)

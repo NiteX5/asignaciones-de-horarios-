@@ -1,7 +1,9 @@
 {% load static %}
 <!-- Core -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="/static/assets/vendor/@popperjs/core/dist/umd/popper.min.js"></script>
 <script src="/static/assets/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <!-- Vendor JS -->
 <script src="/static/assets/vendor/onscreen/dist/on-screen.umd.min.js"></script>
 <!-- Slider -->
@@ -27,13 +29,14 @@
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 <!-- Volt JS -->
 <script src="/static/assets/js/volt.js"></script>
-<!-- Full Calendar -->
-<script src="{% static 'assets/fullcalendari/dist/index.global.js' %}"></script>
+<!-- Carga de FullCalendar y sus complementos -->
+<script src="{% static 'assets/fullcalendar/dist/index.global.js' %}"></script>
 <script src="{% static 'assets/css/tablecss.css' %}"></script>
+<!-- Tu archivo CSS personalizado -->
+<link rel="stylesheet" href="{% static 'assets/css/tablecss.css' %}">
 <!-- Material Icons -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <!-- dataTable -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.css" rel="stylesheet">
@@ -48,3 +51,12 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <!-- Or for RTL support -->
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
+
+<!-- Datepicker -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.es.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<!-- Color picker -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css"/>
+<script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>

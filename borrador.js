@@ -1,77 +1,169 @@
+$(document).ready(function () {
+  $.ajax({
+      url: '{% url "get_docents" %}',
+      method: 'GET',
+      dataType: 'json',
+      success: function (response) {
+          // Obtiene el elemento select
+          var select = $('#profesorSelector');
+          // Agrega las opciones desde la respuesta JSON
+          response.data.forEach(function (option) {
+              select.append($('<option>', {
+                  value: option.id,
+                  text: option.first_name + ' ' + option.last_name
+              }));
+          });
 
-  
-  document.addEventListener("DOMContentLoaded", function () {
-    var containerEl = document.getElementById("external-events-list");
-    var calendarEl = document.getElementById("kt_docs_fullcalendar_drag");
-    var calendar = null;
+          // Inicializa Select2
+          select.select2({
+              placeholder: 'Seleccione un Docente',
+              // se indica que utilizara el css de bootstrap-5
+              theme: "bootstrap-5",
+          });
+      },
+      error: function (error) {
+          console.log(error);
+      }
 
-    // Hacer una solicitud Ajax para obtener los eventos
-    $.get('/get_subjects/', function (data) {
-        var events = data.data;
+  });
 
-        events.forEach(function (event) {
-            var title = event.subject + " - " + event.course__course;
-            var eventId = event.id;
-            var courseId = event.course__id;
-            var duration = "00:45";
+  $("#profesorSelector").on('change', function () {
 
-            // Crear un elemento de evento
-            var eventItem = document.createElement('div');
-            eventItem.className = "fc-event draggable-event";
-            eventItem.setAttribute("data-event", JSON.stringify({
-                title: title,
-                duration: duration,
-                courseId: courseId,
-                eventId: eventId
-            }));
+      idProfesor = $(this).val();
+      console.log(idProfesor);
 
-            var eventText = document.createElement('p');
-            eventText.className = "list-group-item list-group-item-action";
-            eventText.textContent = title;
+      $.ajax({
+          url: '/get_subjects_assignament/' + idProfesor,
+          method: 'GET',
+          dataType: 'json',
+          success: function (response) {
+              // Obtiene el elemento select
+              console.log(response.data);
+              var select = $('#add-subjects');
+              // Agrega las opciones desde la respuesta JSON
+              response.data.forEach(function (option) {
+                  select.append($('<option>', {
+                      value: option.subject__id,
+                      text: option.subject__subject
+                  }));
+              });
 
-            eventItem.appendChild(eventText);
-            containerEl.appendChild(eventItem);
+              // Inicializa Select2
+              select.select2({
+                  placeholder: 'Seleccione una Asignatura',
+                  // se indica que utilizara el css de bootstrap-5
+                  theme: "bootstrap-5",
+                  dropdownParent: $('#modal-form'),
+              });
+          },
+          error: function (error) {
+              console.log(error);
+          }
 
-            // Inicializar FullCalendar Draggable después de cargar los eventos
-            new FullCalendar.Draggable(eventItem, {
-                eventData: function (eventEl) {
-                    var json_event = eventEl.getAttribute("data-event");
-                    var event_array = JSON.parse(json_event);
-                    var duration = "00:45";
-                    var event_title = event_array.title;
-                    return {
-                        title: event_title,
-                        duration: duration,
-                        courseId: event_array.courseId,
-                        eventId: event_array.eventId
-                    };
-                },
-            });
-        });
+      });
 
-        // Inicializar FullCalendar una vez que se hayan cargado los eventos
-        calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: "timeGridWeek",
-            headerToolbar: false,
-            droppable: true,
-            selectable: true,
-            editable: true,
-            allDaySlot: false,
-            slotMinTime: "08:00:00",
-            slotMaxTime: "18:00:00",
-            slotDuration: "00:15",
-            slotLabelInterval: "00:15",
-            eventOverlap: false,
-            contentHeight: 'auto',
-            hiddenDays: [0, 6],
-            editable: true, // Permite mover eventos
-            drop: function (arg) {
-                // Elimina el evento del calendario
-                arg.draggedEl.remove();
-            },
-        });
+      $.ajax({
+          url: '/get_courses/' + idProfesor,
+          method: 'GET',
+          dataType: 'json',
+          success: function (response) {
+              // Obtiene el elemento select
+              console.log(response.data);
+              var select = $('#add-course');
+              // Agrega las opciones desde la respuesta JSON
+              response.data.forEach(function (option) {
+                  select.append($('<option>', {
+                      value: option.id,
+                      text: option.course
+                  }));
+              });
 
-        calendar.setOption('height', 250);
-        calendar.render();
-    });
+              // Inicializa Select2
+              select.select2({
+                  placeholder: 'Seleccione una Asignatura',
+                  // se indica que utilizara el css de bootstrap-5
+                  theme: "bootstrap-5",
+                  dropdownParent: $('#modal-form'),
+              });
+          },
+          error: function (error) {
+              console.log(error);
+          }
+
+      });
+
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+          locale: 'es',
+          initialView: "timeGridWeek",
+          headerToolbar: false,
+          droppable: true,
+          selectable: true,
+          editable: true,
+          allDaySlot: false,
+          slotMinTime: "08:00:00",
+          slotMaxTime: "18:00:00",
+          slotDuration: "00:15",
+          slotLabelInterval: "00:15",
+          eventOverlap: false,
+          contentHeight: 'auto',
+          hiddenDays: [0, 6],
+          editable: true,
+
+          dateClick: function (info) {
+              start = calendar.formatIso(info.date, {omitTimezoneOffset: true});
+              console.log(start);
+              $('#modal-form').modal('show');
+              $('#btn-save-add').on('click', function() {
+                  var course = document.getElementById('add-course').value;
+                  var subject = document.getElementById('add-subjects').value;
+                 
+                  
+              
+                  $.ajax({
+                      url: '{% url "save_schedule" %}',
+                      method: 'POST',
+                      data: { idPro: idProfesor, subject: subject, course: course, csrfmiddlewaretoken: '{{ csrf_token }}' },
+                      dataType: 'json',
+                      success: function (response) {
+                          // Recarga la tabla después de agregar una asignatura
+                          notyf.success(response.message);
+                      },
+                      error: function (error) {
+                          console.log(error.responseJSON.message);
+                          notyf.error(error.responseJSON.message);
+                      }
+                  });
+              
+                  // Cierra el modal de Bootstrap
+                  $('#modal-form').modal('hide');
+              
+                  
+                  });
+          },
+      });
+
+      calendar.render();
+  });
 });
+
+
+
+@login_required(login_url="/login/")
+def get_events(request, id):
+    # Obtener todos los horarios
+    schedules = Schedule.objects.filter(teacher=id)
+    # Serializar los datos y devolverlos como JSON
+    today = datetime.today()
+    prueba = ''
+    data = []
+    for schedule in schedules:
+        id = schedule.id
+        start = schedule.start.strftime("%Y-%m-%dT%H:%M:%S")
+        duration = schedule.end.strftime('%H:%M')  # Asegúrate de que esto es una duración válida
+        title = schedule.title
+        resource = schedule.day_of_week
+        extendedProps = {'course': schedule.course.course, 'subject': schedule.subject.subject, 'teacher': schedule.teacher.id}
+        data.append({'id': id, 'title': title, 'start': start, 'duration': duration,'resourceId': resource , 'extendedProps': extendedProps},)
+    
+    return JsonResponse(data, safe=False)  # Devolver la matriz directamente

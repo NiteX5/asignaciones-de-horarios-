@@ -1,0 +1,45 @@
+<script>
+  var id = '{{ id }}';
+
+
+  events  = 'http://127.0.0.1:8000/get_events/' + id;
+
+  inicalendar = null;
+  var calendarEl = document.getElementById("kt_docs_fullcalendar_drag");
+  
+  inicalendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'resourceTimeGridDay',
+    headerToolbar: false,
+    droppable: false,
+    selectable: false,
+    allDaySlot: false,
+    slotMinTime: "08:00:00",
+    slotMaxTime: "18:00:00",
+    slotDuration: "00:15",
+    slotLabelInterval: "00:15",
+    eventOverlap: false,
+    contentHeight: 'auto',
+    hiddenDays: [0, 6],
+    editable: false,
+    eventDurationEditable: false,
+    events: events,
+    views: {
+      resourceTimeGridFourDay: {
+        type: 'resourceTimeGrid',
+        duration: { days: 5 },
+        buttonText: '5 days'
+      }
+    },
+    resources: [
+      { id: 'A', title: 'Lunes' },
+      { id: 'B', title: 'Martes' },
+      { id: 'C', title: 'Miercoles' },
+      { id: 'D', title: 'Jueves' },
+      { id: 'E', title: 'Viernes' }
+    ],
+      
+    });
+
+    inicalendar.setOption('height', 250);
+    inicalendar.render();
+  </script>

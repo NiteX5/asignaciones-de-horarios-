@@ -1,0 +1,53 @@
+<script>
+   $(document).ready(function(){
+        var notyf = new Notyf();
+        $.ajax({
+            url: '{% url "get_settings" %}',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                // Asigna los valores a los elementos del formulario
+                $('#first_name').val(response.data.first);
+                $('#last_name').val(response.data.last);
+                $('#email').val(response.data.email);
+                $('#phone').val(response.data.phone);
+                $('#Departament').val(response.data.departament);
+            },
+            error: function(data) {
+                console.log(error);
+            }
+        })      
+        $('#btn-save-add').click(function(event) {
+            event.preventDefault();  // Evitar la recarga de la página
+            var first = $('#first_name').val();
+            var last = $('#last_name').val();
+            var email = $('#email').val();
+            var phone = $('#phone').val();
+            if (first.trim() == '' || last.trim() == '' || email.trim() == '' || phone.trim() == '') {
+                notyf.error('Todos los campos son obligatorios');
+            }else{
+                notyf.success('Datos actualizados correctamente');
+                $.ajax({
+                    url: '{% url "update_settings" %}',
+                    method: 'POST',
+                    data: {
+                        'id' : '{{ id }}',
+                        'first': first,
+                        'last': last,
+                        'email': email,
+                        'phone': phone,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response.data.message);
+                        
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+        });
+   });
+</script>
